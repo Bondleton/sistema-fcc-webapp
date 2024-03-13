@@ -1,0 +1,48 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "compileOnSave": false, // compilar automáticamente el proyecto cuando se guarda un archivo
+  "compilerOptions": { // configuración para el compilador TypeScript
+    "baseUrl": "./", // URL base para resolver módulos, lo que significa que la resolución de módulos comienza desde el directorio actual.
+    "outDir": "./dist/out-tsc", //  Especifica el directorio de salida para los archivos compilados.
+    "forceConsistentCasingInFileNames": true, // Obliga al compilador a usar un nombre de archivo consistente en mayúsculas y minúsculas.
+    "strict": true, // Activa todas las opciones estrictas de TypeScript.
+    "strictPropertyInitialization": false, // (No?) Requiere que todas las propiedades de clase se inicialicen en el constructor.
+    "noImplicitOverride": true, // Genera un error si una propiedad o método no sobrescribe correctamente un miembro de su superclase.
+    "noImplicitAny": false,
+    "noPropertyAccessFromIndexSignature": true, //
+    "noImplicitReturns": false, //
+    "noFallthroughCasesInSwitch": true, //
+    "sourceMap": true, // Genera archivos de mapa de origen para facilitar la depuración de código TypeScript en el navegador.
+    "declaration": false, //
+    "downlevelIteration": true, //
+    "experimentalDecorators": true, //
+    "moduleResolution": "node", //
+    "importHelpers": true, //
+    "target": "ES2022", // Especifica la versión de ECMAScript a la que se debe compilar el código TypeScript.
+    "module": "ES2022", // Especifica el formato de módulo para el código generado.
+    "useDefineForClassFields": false, //
+    "lib": [ // Especifica las bibliotecas de definición de TypeScript que están disponibles en tiempo de compilación.
+      "ES2022",
+      "dom"
+    ]
+  },
+  "angularCompilerOptions": { // opciones de configuración específicas del compilador Angular
+    "enableI18nLegacyMessageIdFormat": false, //  Indica si se debe habilitar el formato de identificación de mensajes
+    "strictInjectionParameters": true, // Activa la verificación estricta de los parámetros de inyección de dependencias en Angular.
+    "strictInputAccessModifiers": true, // Activa la verificación estricta de los modificadores de acceso para las propiedades de entrada (@Input)
+    "strictTemplates": true // Activa la verificación estricta de las plantillas
+  }
+}
+
+/*
+NOTAS
+
+Este archivo es el archivo de configuración tsconfig.json
+contiene configuraciones para el compilador TypeScript y
+el compilador Angular, asegurando que el código TypeScript
+se compile correctamente y se ajuste a las mejores prácticas
+recomendadas por Angular.
+
+
+
+*/
