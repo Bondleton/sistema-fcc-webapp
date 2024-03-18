@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AlumnosService } from '../../services/alumnos.service';
+import { Router } from '@angular/router';
 declare var $: any; //Para poder usar el jquery
 
 @Component({
@@ -23,7 +24,8 @@ export class RegistroAlumnosComponent implements OnInit {
   public inputType_2: string = 'password';
 
   constructor(
-    private alumnosService: AlumnosService
+    private alumnosService: AlumnosService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -45,7 +47,25 @@ export class RegistroAlumnosComponent implements OnInit {
     if (!$.isEmptyObject(this.errors)) {
       return false;
     }
-    //TODO ejecuta la siguiente línea
+
+    // Validación
+    if (this.alumno.password == this.alumno.confirmar_password) {
+      //Aquí si todo es correcto (las contraseñas coinciden) vamos a registrar - aquí se manda a consumir el servicio
+      this.alumnosService.registrarAlumno(this.alumno).subscribe(
+        (response) => { // si todo sale correcto que nos mande al login
+          alert("Usuario registrado correctamente");
+          console.log("Usuario registrado: ", response); // agregar el router al constructor
+          this.router.navigate(["/"]);
+        }, (error) => {
+          alert("No se pudo registrar usuario");
+        }
+      );
+    } else {
+      alert("Las contraseñas no coinciden"); // lo regresa como vacio
+      this.alumno.password = "";
+      this.alumno.confirmar_password = "";
+    }
+
   }
 
   public actualizar() {

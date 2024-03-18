@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AdministradoresService } from '../../services/administradores.service';
+import { Router } from '@angular/router';
 //Para poder usar el jquery definir la siguiente linea
 declare var $: any;
 
@@ -25,7 +26,8 @@ export class RegistroAdminComponent implements OnInit {
 
 
   constructor(
-    private administradoresService: AdministradoresService
+    private administradoresService: AdministradoresService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -49,7 +51,25 @@ export class RegistroAdminComponent implements OnInit {
     if (!$.isEmptyObject(this.errors)) {
       return false;
     }
-    //TODO ejecuta la siguiente línea
+    //Validamos que las contraseñas coincidan
+    //Validar la contraseña
+    if (this.admin.password == this.admin.confirmar_password) {
+      //Aquí si todo es correcto (las contraseñas coinciden) vamos a registrar - aquí se manda a consumir el servicio
+      this.administradoresService.registrarAdmin(this.admin).subscribe(
+        (response) => { // si todo sale correcto que nos mande al login
+          alert("Usuario registrado correctamente");
+          console.log("Usuario registrado: ", response); // agregar el router al constructor
+          this.router.navigate(["/"]);
+        }, (error) => {
+          alert("No se pudo registrar usuario");
+        }
+      );
+    } else {
+      alert("Las contraseñas no coinciden"); // lo regresa como vacio
+      this.admin.password = "";
+      this.admin.confirmar_password = "";
+    }
+
   }
 
   public actualizar() {

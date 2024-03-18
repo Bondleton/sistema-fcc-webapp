@@ -1,8 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ValidatorService } from './tools/validator.service';
 import { ErrorsService } from './tools/errors.service';
+import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
 
 @Injectable({
   providedIn: 'root'
@@ -12,36 +17,34 @@ export class MaestrosService {
   constructor(
     private http: HttpClient,
     private validatorService: ValidatorService,
-    private errorService: ErrorsService,
-    // private facadeService: FacadeService
+    private errorService: ErrorsService
   ) { }
 
   public esquemaMaestro() {
     return {
-      'rol': '', // Representa el rol del maestro
-      'clave_maestro': '', // Representa la clave única del maestro.
-      'first_name': '', // Representa el nombre del maestro.
-      'last_name': '', // Representa el apellido del maestro.
-      'email': '', // Representa la dirección de correo electrónico del maestro.
-      'password': '', // Representa la contraseña del maestro.
-      'confirmar_password': '', // Representa la confirmación de la contraseña del maestro.
-      'telefono': '', // Representa el número de teléfono del maestro.
-      'rfc': '', // Representa el RFC del maestro.
-      'edad': '', // Representa la edad del maestro.
-      'fecha_na': '', // Representa fecha de nacimiento del maestro.
-      'cubiculo': '',  // Representa el cubículo del maestro.
-      'area': '',  // Representa el area de investigacion del maestro.
-      'materias_json': [] //Inicializar como array vacio
+      'rol': '',
+      'id_trabajador': '',
+      'first_name': '',
+      'last_name': '',
+      'email': '',
+      'password': '',
+      'confirmar_password': '',
+      'fecha_nacimiento': '',
+      'telefono': '',
+      'rfc': '',
+      'cubiculo': '',
+      'area_investigacion': '',
+      'materias_json': []
     }
   }
 
   //Validación para el formulario
-  public validarMaestro(data: any, editar: boolean) { // data: Es un objeto que contiene los datos del maestro que se van a validar.
-    console.log("Validando maestro... ", data); // editar : booleando que indica si se esta editando un maestro existente o uno nuevo
+  public validarMaestro(data: any, editar: boolean) {
+    console.log("Validando maestro... ", data);
     let error: any = [];
 
-    if (!this.validatorService.required(data["clave_maestro"])) {
-      error["clave_maestro"] = this.errorService.required;
+    if (!this.validatorService.required(data["id_trabajador"])) {
+      error["id_trabajador"] = this.errorService.required;
     }
 
     if (!this.validatorService.required(data["first_name"])) {
@@ -70,6 +73,10 @@ export class MaestrosService {
       }
     }
 
+    if (!this.validatorService.required(data["fecha_nacimiento"])) {
+      error["fecha_nacimiento"] = this.errorService.required;
+    }
+
     if (!this.validatorService.required(data["rfc"])) {
       error["rfc"] = this.errorService.required;
     } else if (!this.validatorService.min(data["rfc"], 12)) {
@@ -80,42 +87,31 @@ export class MaestrosService {
       alert("La longitud de caracteres deL RFC es mayor, deben ser 13");
     }
 
-    if (!this.validatorService.required(data["edad"])) {
-      error["edad"] = this.errorService.required;
-    } else if (!this.validatorService.numeric(data["edad"])) {
-      alert("El formato es solo números");
-    }
-
     if (!this.validatorService.required(data["telefono"])) {
       error["telefono"] = this.errorService.required;
-    }
-
-    if (!this.validatorService.required(data["fecha_na"])) {
-      error["fecha_na"] = this.errorService.required;
     }
 
     if (!this.validatorService.required(data["cubiculo"])) {
       error["cubiculo"] = this.errorService.required;
     }
 
-    // if (!this.validatorService.required(data["area"])) {
-    //   error["area"] = this.errorService.required;
-    // } (Mio)
-
     if (!this.validatorService.required(data["area_investigacion"])) {
       error["area_investigacion"] = this.errorService.required;
     }
 
-    // validacion para el checkbox
-    if (data["materias_json"].length == 0) { // si aun no se lecciona nada, es decir las casillas elegidas son 0, manda un alert
+    if (data["materias_json"].length == 0) {
       error["materias_json"] = "Al menos debes elegir una materia";
       //alert("Debes seleccionar materias para poder registrarte.");
     }
-
     //Return arreglo
-    return error;  // se almacena en el objeto "error"
+    return error;
   }
 
+  //Aquí van los servicios HTTP
+  //Servicio para registrar un nuevo usuario
+  public registrarAdmin(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.url_api}/maestros/`, data, httpOptions);
+  }
 
 
 }

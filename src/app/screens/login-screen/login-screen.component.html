@@ -13,7 +13,7 @@
              <!-- Input para correo electronico -->
             <div class="pt-3 mb-3">
               <input type="email" [(ngModel)]="username" class="form-control" id="email" placeholder="Correo electrónico">
-              <!-- <div *ngIf="errors.username" class="invalid-feedback">{{ errors.username }}</div> -->
+              <div *ngIf="errors.username" class="invalid-feedback">{{ errors.username }}</div>
             </div>
 
             <!-- Input para contraseña -->
@@ -25,7 +25,7 @@
                   <i *ngIf="type == 'text'" class="bi bi-eye-slash-fill" (click)="showPassword()"></i>
                 </div>
               </div>
-              <!-- <div *ngIf="errors.password" class="invalid-feedback">{{ errors.password }}</div> -->
+              <div *ngIf="errors.password" class="invalid-feedback">{{ errors.password }}</div>
             </div>
 
             <!-- Label olvidé contraseña -->

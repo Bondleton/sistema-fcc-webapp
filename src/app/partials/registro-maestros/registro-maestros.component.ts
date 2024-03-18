@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { MaestrosService } from 'src/app/services/maestros.service';
-import { MatRadioChange } from '@angular/material/radio';
-declare var $: any; //Para poder usar el jquery
+import { ActivatedRoute, Router } from '@angular/router';
+declare var $: any;
 
 @Component({
   selector: 'app-registro-maestros',
@@ -9,21 +10,31 @@ declare var $: any; //Para poder usar el jquery
   styleUrls: ['./registro-maestros.component.scss']
 })
 export class RegistroMaestrosComponent implements OnInit {
-  @Input() rol: string = ""; // el componente puede recibir un valor para esta propiedad desde su componente padre
 
-  // Variables
-  public maestro: any = {};
-  public editar: boolean = false;
-  public errors: any = {};
-
-
-  // Variables para las contraseñas
+  @Input() rol: string = "";
+  //Para contraseñas
   public hide_1: boolean = false;
   public hide_2: boolean = false;
   public inputType_1: string = 'password';
   public inputType_2: string = 'password';
 
-  // Array para materias - checkbox
+  public maestro: any = {};
+  public errors: any = {};
+  public editar: boolean = false;
+  public idUser: Number = 0;
+  //Check
+  public valoresCheckbox: any = [];
+  public materias_json: any[] = [];
+
+  //Para el select
+  public areas: any[] = [
+    { value: '1', viewValue: 'Desarrollo Web' },
+    { value: '2', viewValue: 'Programación' },
+    { value: '3', viewValue: 'Bases de datos' },
+    { value: '4', viewValue: 'Redes' },
+    { value: '5', viewValue: 'Matemáticas' },
+  ];
+
   public materias: any[] = [
     { value: '1', nombre: 'Aplicaciones Web' },
     { value: '2', nombre: 'Programación 1' },
@@ -36,60 +47,60 @@ export class RegistroMaestrosComponent implements OnInit {
     { value: '9', nombre: 'Ingeniería de Software' },
     { value: '10', nombre: 'Administración de S.O.' },
   ];
-
   constructor(
-    private maestrosService: MaestrosService
-  ) { }
-
-
-  ngOnInit(): void {
-    //Definir el esquema a mi JSON
-    this.maestro = this.maestrosService.esquemaMaestro();
-    this.maestro.rol = this.rol; // Asigna el valor de la propiedad rol del componente (this.rol) a la propiedad rol del objeto maestro.
-    console.log("Maestro: ", this.maestro);
+    private location: Location,
+    private maestrosService: MaestrosService,
+    private router: Router,
+    public activatedRoute: ActivatedRoute,
+  ) {
 
   }
 
-  public regresar() {
+  ngOnInit() {
+    this.maestro = this.maestrosService.esquemaMaestro();
+    this.maestro.rol = this.rol;
+    //Imprimir datos en consola
+    console.log("Maestro: ", this.maestro);
+  }
 
+  public regresar() {
+    this.location.back();
   }
 
   public registrar() {
     //Validar
     this.errors = [];
 
-    this.errors = this.maestrosService.validarMaestro(this.maestro, this.editar)
+    this.errors = this.maestrosService.validarMaestro(this.maestro, this.editar);
     if (!$.isEmptyObject(this.errors)) {
       return false;
     }
-    //TODO ejecuta la siguiente línea
-  }
-
-  public actualizar() {
-
-  }
-
-  // Para el checkbox
-  public checkboxChange(event: any) {
-    //console.log("Evento: ", event);
-    if (event.checked) {
-      this.maestro.materias_json.push(event.source.value)
-    } else {
-      console.log(event.source.value);
-      this.maestro.materias_json.forEach((materia, i) => {
-        if (materia == event.source.value) {
-          this.maestro.materias_json.splice(i, 1)
+    //Validamos que las contraseñas coincidan
+    //Validar la contraseña
+    if (this.maestro.password == this.maestro.confirmar_password) {
+      //Aquí si todo es correcto (las contraseñas coinciden) vamos a registrar - aquí se manda a consumir el servicio
+      this.maestrosService.registrarAdmin(this.maestro).subscribe(
+        (response) => { // si todo sale correcto que nos mande al login
+          alert("Usuario registrado correctamente");
+          console.log("Usuario registrado: ", response); // agregar el router al constructor
+          this.router.navigate(["/"]);
+        }, (error) => {
+          alert("No se pudo registrar usuario");
         }
-      });
+      );
+    } else {
+      alert("Las contraseñas no coinciden"); // lo regresa como vacio
+      this.maestro.password = "";
+      this.maestro.confirmar_password = "";
     }
-    console.log("Array materias: ", this.maestro);
+    
   }
 
-  // Funciones para password
+  //Funciones para password
   showPassword() {
-    if (this.inputType_1 == 'password') { // Si es tipo contraseña lo oculta
-      this.inputType_1 = 'text'; // Si es tipo texto muestralo
-      this.hide_1 = true; // si no es pass, es texto
+    if (this.inputType_1 == 'password') {
+      this.inputType_1 = 'text';
+      this.hide_1 = true;
     }
     else {
       this.inputType_1 = 'password';
@@ -109,39 +120,35 @@ export class RegistroMaestrosComponent implements OnInit {
   }
 
   //Función para detectar el cambio de fecha
-  //Para la fecha
-  public changeFecha(event: any) { //el evento regresa uno de cualquier tipo
+  public changeFecha(event: any) {
     console.log(event);
-    console.log(event.value.toISOString()); // Entremos a la propiedad value, String
-    //Se lo asigno a this. La T significa la hora, entonces con split es para dividir cadenas
+    console.log(event.value.toISOString());
+
     this.maestro.fecha_nacimiento = event.value.toISOString().split("T")[0];
     console.log("Fecha: ", this.maestro.fecha_nacimiento);
   }
 
-  // Para el select
+  public actualizar() {
+
+  }
+
+  public checkboxChange(event: any) {
+    console.log("Evento: ", event);
+    if (event.checked) {
+      this.maestro.materias_json.push(event.source.value)
+    } else {
+      console.log(event.source.value);
+      this.maestro.materias_json.forEach((materia, i) => {
+        if (materia == event.source.value) {
+          this.maestro.materias_json.splice(i, 1);
+        }
+      });
+    }
+    console.log("Array materias: ", this.maestro);
+  }
+
   public changeSelect(event: any) {
     console.log(event.value);
     this.maestro.area_investigacion = event.value;
   }
-
-  // Array para áreas de investigación (Mio)
-  // public areas: any[] = [
-  //   { value: '1', inves: 'Desarrollo Web' },
-  //   { value: '2', inves: 'Programación' },
-  //   { value: '3', inves: 'Redes' },
-  //   { value: '4', inves: 'Matemáticas' },
-  // ];
-
-  //Para el select
-  public areas: any[] = [
-    { value: '1', viewValue: 'Desarrollo Web' },
-    { value: '2', viewValue: 'Programación' },
-    { value: '3', viewValue: 'Bases de datos' },
-    { value: '4', viewValue: 'Redes' },
-    { value: '5', viewValue: 'Matemáticas' },
-  ];
-
-  // validacion del check box
-
-
 }
