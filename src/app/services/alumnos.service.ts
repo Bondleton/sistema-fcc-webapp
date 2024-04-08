@@ -4,6 +4,7 @@ import { ValidatorService } from './tools/validator.service';
 import { ErrorsService } from './tools/errors.service';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { FacadeService } from './facade.service';
 
 //Crear una constante
 const httpOptions = {
@@ -19,7 +20,7 @@ export class AlumnosService {
     private http: HttpClient,
     private validatorService: ValidatorService,
     private errorService: ErrorsService,
-    // private facadeService: FacadeService
+    private facadeService: FacadeService
   ) { }
 
   public esquemaAlumno() {
@@ -117,10 +118,16 @@ export class AlumnosService {
     return error;  // se almacena en el objeto "error"
   }
 
-  //Aquí van los servicios HTTP 
+  //Aquí van los servicios HTTP
   //Servicio para registrar un nuevo usuario
   public registrarAlumno(data: any): Observable<any> {
     return this.http.post<any>(`${environment.url_api}/alumnos/`, data, httpOptions);
+  }
+
+  public obtenerListaAlumnos(): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.get<any>(`${environment.url_api}/lista-alumnos/`, { headers: headers });
   }
 
 }
