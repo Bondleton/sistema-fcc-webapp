@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { MaestrosService } from 'src/app/services/maestros.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FacadeService } from 'src/app/services/facade.service';
 declare var $: any;
 
 @Component({
@@ -10,8 +11,10 @@ declare var $: any;
   styleUrls: ['./registro-maestros.component.scss']
 })
 export class RegistroMaestrosComponent implements OnInit {
-
+  // Decorador permitir la comunicación entre componentes padres e hijos mediante la transmisión de datos
   @Input() rol: string = "";
+  @Input() datos_user: any = {}; // TODO: Importante definirlo para el alumno
+
   //Para contraseñas
   public hide_1: boolean = false;
   public hide_2: boolean = false;
@@ -19,6 +22,7 @@ export class RegistroMaestrosComponent implements OnInit {
   public inputType_2: string = 'password';
 
   public maestro: any = {};
+  public token: string = "";
   public errors: any = {};
   public editar: boolean = false;
   public idUser: Number = 0;
@@ -52,13 +56,25 @@ export class RegistroMaestrosComponent implements OnInit {
     private maestrosService: MaestrosService,
     private router: Router,
     public activatedRoute: ActivatedRoute,
+    private facadeService: FacadeService
   ) {
 
   }
 
   ngOnInit() {
-    this.maestro = this.maestrosService.esquemaMaestro();
-    this.maestro.rol = this.rol;
+    //El primer if valida si existe un parámetro en la URL
+    if (this.activatedRoute.snapshot.params['id'] != undefined) {
+      this.editar = true;
+      //Asignamos a nuestra variable global el valor del ID que viene por la URL
+      this.idUser = this.activatedRoute.snapshot.params['id'];
+      console.log("ID User: ", this.idUser);
+      //Al iniciar la vista asignamos los datos del user
+      this.maestro = this.datos_user;
+    } else {
+      this.maestro = this.maestrosService.esquemaMaestro();
+      this.maestro.rol = this.rol;
+      this.token = this.facadeService.getSessionToken();
+    }
     //Imprimir datos en consola
     console.log("Maestro: ", this.maestro);
   }
@@ -75,25 +91,29 @@ export class RegistroMaestrosComponent implements OnInit {
     if (!$.isEmptyObject(this.errors)) {
       return false;
     }
-    //Validamos que las contraseñas coincidan
+
     //Validar la contraseña
     if (this.maestro.password == this.maestro.confirmar_password) {
-      //Aquí si todo es correcto (las contraseñas coinciden) vamos a registrar - aquí se manda a consumir el servicio
-      this.maestrosService.registrarAdmin(this.maestro).subscribe(
-        (response) => { // si todo sale correcto que nos mande al login
+      //Aquí si todo es correcto vamos a registrar - aquí se manda a llamar al servicio
+      this.maestrosService.registrarMaestro(this.maestro).subscribe(
+        (response) => {
           alert("Usuario registrado correctamente");
-          console.log("Usuario registrado: ", response); // agregar el router al constructor
-          this.router.navigate(["/"]);
+          console.log("Usuario registrado: ", response);
+          if (this.token != "") {
+            this.router.navigate(["home"]);
+          } else {
+            this.router.navigate(["/"]);
+          }
         }, (error) => {
           alert("No se pudo registrar usuario");
         }
-      );
+      )
     } else {
-      alert("Las contraseñas no coinciden"); // lo regresa como vacio
+      alert("Las contraseñas no coinciden");
       this.maestro.password = "";
       this.maestro.confirmar_password = "";
     }
-    
+
   }
 
   //Funciones para password
@@ -129,26 +149,58 @@ export class RegistroMaestrosComponent implements OnInit {
   }
 
   public actualizar() {
+    //Validación
+    this.errors = [];
 
+    this.errors = this.maestrosService.validarMaestro(this.maestro, this.editar);
+    if (!$.isEmptyObject(this.errors)) {
+      return false;
+    }
+    console.log("Pasó la validación");
+
+    this.maestrosService.editarMaestro(this.maestro).subscribe(
+      (response) => {
+        alert("Maestro editado correctamente");
+        console.log("Maestro editado: ", response);
+        //Si se editó, entonces mandar al home
+        this.router.navigate(["home"]);
+      }, (error) => {
+        alert("No se pudo editar el maestro");
+      }
+    );
   }
 
   public checkboxChange(event: any) {
-    console.log("Evento: ", event);
+    //console.log("Evento: ", event);
     if (event.checked) {
       this.maestro.materias_json.push(event.source.value)
     } else {
       console.log(event.source.value);
       this.maestro.materias_json.forEach((materia, i) => {
         if (materia == event.source.value) {
-          this.maestro.materias_json.splice(i, 1);
+          this.maestro.materias_json.splice(i, 1)
         }
       });
     }
     console.log("Array materias: ", this.maestro);
   }
 
-  public changeSelect(event: any) {
-    console.log(event.value);
-    this.maestro.area_investigacion = event.value;
+  // public changeSelect(event: any) {
+  //   console.log(event.value);
+  //   this.maestro.area_investigacion = event.value;
+  // }
+
+  public revisarSeleccion(nombre: string) {
+    if (this.maestro.materias_json) {
+      var busqueda = this.maestro.materias_json.find((element) => element == nombre);
+      if (busqueda != undefined) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
+
 }

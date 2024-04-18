@@ -45,8 +45,8 @@ export class AdminScreenComponent implements OnInit {
 
   //Funcion para editar
   public goEditar(idUser: number) {
-    this.router.navigate(["registro/" + idUser]);
-  }
+    this.router.navigate(["registro-usuarios/administrador/" + idUser]);
+  } // Se concatena el iduser, para obtener los datos añadimos /administrador
 
   public delete(idUser: number) {
 

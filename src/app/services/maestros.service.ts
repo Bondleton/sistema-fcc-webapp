@@ -110,8 +110,8 @@ export class MaestrosService {
   }
 
   //Aquí van los servicios HTTP
-  //Servicio para registrar un nuevo usuario  // TODO: registrarMaestro ?
-  public registrarAdmin(data: any): Observable<any> {
+  //Servicio para registrar un nuevo usuario  // TODO: registrarMaestro ? registrarAdmin
+  public registrarMaestro(data: any): Observable<any> {
     return this.http.post<any>(`${environment.url_api}/maestros/`, data, httpOptions);
   }
 
@@ -119,6 +119,19 @@ export class MaestrosService {
     var token = this.facadeService.getSessionToken();
     var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
     return this.http.get<any>(`${environment.url_api}/lista-maestros/`, { headers: headers });
+  }
+
+  //Obtener un solo maestro dependiendo su ID
+  public getMaestroByID(idUser: Number) {
+    return this.http.get<any>(`${environment.url_api}/maestros/?id=${idUser}`, httpOptions);
+    // Imprimir una variable en una cadena compuesta con $ { variable }
+  }
+
+  //Servicio para actualizar un usuario
+  public editarMaestro(data: any): Observable<any> {
+    var token = this.facadeService.getSessionToken();
+    var headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    return this.http.put<any>(`${environment.url_api}/maestros-edit/`, data, { headers: headers });
   }
 
 

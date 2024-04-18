@@ -98,8 +98,8 @@ export class AlumnosScreenComponent implements OnInit {
 
   //Funcion para editar
   public goEditar(idUser: number) {
-    this.router.navigate(["registro/" + idUser]);
-  }
+    this.router.navigate(["registro-usuarios/alumno/" + idUser]);
+  } // Se concatena el iduser, para obtener los datos añadimos /maestros
 
   public delete(idUser: number) {
 

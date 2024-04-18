@@ -1,6 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AdministradoresService } from '../../services/administradores.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FacadeService } from 'src/app/services/facade.service';
+import { Location } from '@angular/common';
+
 //Para poder usar el jquery definir la siguiente linea
 declare var $: any;
 
@@ -12,11 +15,15 @@ declare var $: any;
 export class RegistroAdminComponent implements OnInit {
   // Decorador Input: permite que los datos fluyan desde el componente padre hacia el componente hijo
   @Input() rol: string = ""; // declara una propiedad rol en el componente RegistroAdminComponent que puede ser recibida como entrada desde su componente padre.
+  @Input() datos_user: any = {};  // Datos de usuario como clave
 
   // Variables
   public admin: any = {};
   public editar: boolean = false;
   public errors: any = {};
+
+  public token: string = "";
+  public idUser: Number = 0;
 
   // Variables para las contraseñas
   public hide_1: boolean = false;
@@ -24,23 +31,36 @@ export class RegistroAdminComponent implements OnInit {
   public inputType_1: string = 'password';
   public inputType_2: string = 'password';
 
-
   constructor(
     private administradoresService: AdministradoresService,
-    private router: Router
+    private router: Router,
+    private location: Location,
+    public activatedRoute: ActivatedRoute,
+    private facadeService: FacadeService
   ) { }
 
   ngOnInit(): void {
-    //Definir el esquema a mi JSON
-    this.admin = this.administradoresService.esquemaAdmin();
-    this.admin.rol = this.rol; // Asigna el valor de la propiedad rol del componente (this.rol) a la propiedad rol del objeto admin.
+    //El primer if valida si existe un parámetro en la URL
+    if (this.activatedRoute.snapshot.params['id'] != undefined) {
+      this.editar = true;
+      //Asignamos a nuestra variable global el valor del ID que viene por la URL
+      this.idUser = this.activatedRoute.snapshot.params['id'];
+      console.log("ID User: ", this.idUser);
+      //Al iniciar la vista asignamos los datos del user
+      this.admin = this.datos_user;
+    } else {
+      //Definir el esquema a mi JSON
+      this.admin = this.administradoresService.esquemaAdmin();
+      this.admin.rol = this.rol;  // Asigna el valor de la propiedad rol del componente (this.rol) a la propiedad rol del objeto admin.
+      this.token = this.facadeService.getSessionToken();
+    }
+    //Imprimir datos en consola
     console.log("Admin: ", this.admin);
 
   }
 
-  //
   public regresar() {
-
+    this.location.back();
   }
 
   public registrar() {
@@ -73,10 +93,26 @@ export class RegistroAdminComponent implements OnInit {
   }
 
   public actualizar() {
+    //Verifica que no haya campos vacios y pasa la validación
+    this.errors = [];
 
+    this.errors = this.administradoresService.validarAdmin(this.admin, this.editar);
+    if (!$.isEmptyObject(this.errors)) {
+      return false;
+    }
+    console.log("Pasó la validación");
+
+    this.administradoresService.editarAdmin(this.admin).subscribe(
+      (response) => {
+        alert("Administrador editado correctamente");
+        console.log("Admin editado: ", response);
+        //Si se editó, entonces mandar al home
+        this.router.navigate(["home"]);
+      }, (error) => {
+        alert("No se pudo editar el administrador");
+      }
+    );
   }
-
-
 
   // Funciones para password
   showPassword() {
