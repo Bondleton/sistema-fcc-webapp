@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 // import { EliminarUserModalComponent } from 'src/app/modals/eliminar-user-modal/eliminar-user-modal.component';
 import { FacadeService } from 'src/app/services/facade.service';
 import { MaestrosService } from '../../services/maestros.service';
+import { EliminarUserModalComponent } from 'src/app/modals/eliminar-user-modal/eliminar-user-modal.component';
 
 @Component({
   selector: 'app-maestros-screen',
@@ -110,22 +111,22 @@ export class MaestrosScreenComponent implements OnInit {
   }
 
   public delete(idUser: number) {
-    // const dialogRef = this.dialog.open(EliminarUserModalComponent, {
-    //   data: { id: idUser, rol: 'maestro' }, //Se pasan valores a través del componente
-    //   height: '288px',
-    //   width: '328px',
-    // });
+    const dialogRef = this.dialog.open(EliminarUserModalComponent, {
+      data: { id: idUser, rol: 'maestro' }, //Se pasan valores a través del componente
+      height: '288px',
+      width: '328px',
+    });
 
-    // dialogRef.afterClosed().subscribe(result => {
-    //   if (result.isDelete) {
-    //     console.log("Maestro eliminado");
-    //     //Recargar página
-    //     window.location.reload();
-    //   } else {
-    //     alert("Maestro no eliminado ");
-    //     console.log("No se eliminó el maestro");
-    //   }
-    // });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.isDelete) {
+        console.log("Maestro eliminado");
+        //Recargar página
+        window.location.reload();
+      } else {
+        alert("Maestro no eliminado ");
+        console.log("No se eliminó el maestro");
+      }
+    });
   }
 
 } // Cierre

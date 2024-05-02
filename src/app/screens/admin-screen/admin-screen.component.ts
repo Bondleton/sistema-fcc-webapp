@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AdministradoresService } from '../../services/administradores.service';
 import { FacadeService } from 'src/app/services/facade.service';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { EliminarUserModalComponent } from 'src/app/modals/eliminar-user-modal/eliminar-user-modal.component';
 
 @Component({
   selector: 'app-admin-screen',
@@ -17,7 +19,8 @@ export class AdminScreenComponent implements OnInit {
   constructor(
     public facadeService: FacadeService, // Lo vamos a usar en las funciones: las cookies
     private administradoresService: AdministradoresService,
-    private router: Router
+    private router: Router,
+    public dialog: MatDialog
 
   ) { }
 
@@ -49,6 +52,22 @@ export class AdminScreenComponent implements OnInit {
   } // Se concatena el iduser, para obtener los datos añadimos /administrador
 
   public delete(idUser: number) {
+    const dialogRef = this.dialog.open(EliminarUserModalComponent, {
+      data: { id: idUser, rol: 'administrador' }, //Se transfieren/pasan valores/parametros a través del componente
+      height: '288px',
+      width: '328px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => { // Función que devuelve una llamada
+      if (result.isDelete) { // Si la bandera es true, significa que el admin fue elimninado
+        console.log("Admin eliminado");
+        //Recargar página
+        window.location.reload(); // Recargar la pagina
+      } else {
+        alert("Administrador no eliminado ");
+        console.log("No se eliminó el admin");
+      }
+    });
 
   }
 
