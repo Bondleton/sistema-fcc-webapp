@@ -52,6 +52,10 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(["registro-usuarios"]);
   }
 
+  public goRegistroMaterias() {
+    this.router.navigate(["registro-materias"]);
+  }
+
   public clickNavLink(link: string) {
     this.router.navigate([link]);
     setTimeout(() => {
@@ -76,7 +80,23 @@ export class NavbarComponent implements OnInit {
       $("#maestro").removeClass("active");
       $("#principal").removeClass("active");
       $("#graficas").addClass("active");
+    } else if (link == "materias") {
+      $("#alumno").removeClass("active");
+      $("#maestro").removeClass("active");
+      $("#principal").removeClass("active");
+      $("#graficas").removeClass("active");
+      $("#materias").addClass("active");
     }
+    else if (link == "registrar") {
+      $("#alumno").removeClass("active");
+      $("#maestro").removeClass("active");
+      $("#principal").removeClass("active");
+      $("#graficas").removeClass("active");
+      $("#materias").removeClass("active");
+      $("#registrar").addClass("active");
+    }
+
+
   }
 
 

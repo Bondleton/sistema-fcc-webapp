@@ -16,9 +16,11 @@
             <li class="nav-item" *ngIf="rol!='maestro' && rol!='alumno'">
               <a class="nav-link" id="maestro" (click)="clickNavLink('maestros')">Maestros</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link">Lista de materias</a>
+
+            <li class="nav-item"> <!--TODO: Solo pueden ver las listas los admins?-->
+              <a class="nav-link" id="materias" (click)="clickNavLink('materias')">Lista de materias</a>
             </li>
+
             <li class="nav-item" *ngIf="rol=='administrador'"> <!--Solo pueden ver las graficas los admins-->
               <a class="nav-link" id="graficas" (click)="clickNavLink('graficas')">Gráficas</a>
             </li>
@@ -30,7 +32,7 @@
                 <li><a class="dropdown-item" (click)="goRegistro()" *ngIf="rol!='alumno'">Alumnos</a></li>
                 <li><a class="dropdown-item" (click)="goRegistro()" *ngIf="rol!='maestro' && rol!='alumno'">Maestros</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Materias</a></li>
+                <li><a class="dropdown-item" (click)="goRegistroMaterias()">Materias</a></li>
               </ul>
             </li>
           </ng-container>

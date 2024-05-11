@@ -12,6 +12,7 @@ export class GraficasScreenComponent implements OnInit {
   //Agregar chartjs-plugin-datalabels
   //Variables
   public total_user: any = {};
+
   //Histograma
   lineChartData = {
     labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -97,6 +98,7 @@ export class GraficasScreenComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerTotalUsers();
+    
   }
 
   public obtenerTotalUsers() {
