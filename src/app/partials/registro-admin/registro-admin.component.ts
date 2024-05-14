@@ -3,6 +3,8 @@ import { AdministradoresService } from '../../services/administradores.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FacadeService } from 'src/app/services/facade.service';
 import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { EditarUserModalComponent } from 'src/app/modals/editar-user-modal/editar-user-modal.component';
 
 //Para poder usar el jquery definir la siguiente linea
 declare var $: any;
@@ -36,7 +38,8 @@ export class RegistroAdminComponent implements OnInit {
     private router: Router,
     private location: Location,
     public activatedRoute: ActivatedRoute,
-    private facadeService: FacadeService
+    private facadeService: FacadeService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -93,7 +96,7 @@ export class RegistroAdminComponent implements OnInit {
   }
 
   public actualizar() {
-    //Verifica que no haya campos vacios y pasa la validación
+    //Validación
     this.errors = [];
 
     this.errors = this.administradoresService.validarAdmin(this.admin, this.editar);
@@ -102,16 +105,28 @@ export class RegistroAdminComponent implements OnInit {
     }
     console.log("Pasó la validación");
 
-    this.administradoresService.editarAdmin(this.admin).subscribe(
-      (response) => {
-        alert("Administrador editado correctamente");
-        console.log("Admin editado: ", response);
-        //Si se editó, entonces mandar al home
-        this.router.navigate(["home"]);
-      }, (error) => {
-        alert("No se pudo editar el administrador");
+    const dialogRef = this.dialog.open(EditarUserModalComponent, {
+      data: { rol: 'administrador' }, //Se pasan valores a través del componente
+      height: '288px',
+      width: '328px',
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.isEdit) {
+        this.administradoresService.editarAdmin(this.admin).subscribe(
+          (response) => {
+            alert("Administrador editado correctamente");
+            console.log("Administrador editado: ", response);
+            //Si se editó, entonces mandar al home
+            this.router.navigate(["home"]);
+          }, (error) => {
+            alert("No se pudo editar al administrador");
+            console.log("Error: ", error);
+          }
+        );
+      } else {
+        console.log("No se editó al administrador");
       }
-    );
+    });
   }
 
   // Funciones para password

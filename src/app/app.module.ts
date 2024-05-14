@@ -40,6 +40,7 @@ import { RegistroMateriasComponent } from './partials/registro-materias/registro
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { RegistroMateriasScreenComponent } from './screens/registro-materias-screen/registro-materias-screen.component';
 import { MateriasScreenComponent } from './screens/materias-screen/materias-screen.component';
+import { EditarUserModalComponent } from './modals/editar-user-modal/editar-user-modal.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MateriasScreenComponent } from './screens/materias-screen/materias-scre
     RegistroMateriasComponent,
     RegistroMateriasScreenComponent,
     MateriasScreenComponent,
+    EditarUserModalComponent,
   ],
   imports: [
     BrowserModule,

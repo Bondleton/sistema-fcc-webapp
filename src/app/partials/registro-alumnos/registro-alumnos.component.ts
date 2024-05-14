@@ -3,6 +3,8 @@ import { Location } from '@angular/common';
 import { AlumnosService } from '../../services/alumnos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FacadeService } from 'src/app/services/facade.service';
+import { MatDialog } from '@angular/material/dialog';
+import { EditarUserModalComponent } from 'src/app/modals/editar-user-modal/editar-user-modal.component';
 declare var $: any; //Para poder usar el jquery
 
 @Component({
@@ -34,7 +36,8 @@ export class RegistroAlumnosComponent implements OnInit {
     private alumnosService: AlumnosService,
     private router: Router,
     public activatedRoute: ActivatedRoute,
-    private facadeService: FacadeService
+    private facadeService: FacadeService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -89,7 +92,7 @@ export class RegistroAlumnosComponent implements OnInit {
   }
 
   public actualizar() {
-    //Validación de que no hay campos vacios
+    //Validación
     this.errors = [];
 
     this.errors = this.alumnosService.validarAlumno(this.alumno, this.editar);
@@ -98,16 +101,29 @@ export class RegistroAlumnosComponent implements OnInit {
     }
     console.log("Pasó la validación");
 
-    this.alumnosService.editarAlumno(this.alumno).subscribe(
-      (response) => {
-        alert("Alumno editado correctamente");
-        console.log("Alumno editado: ", response);
-        //Si se editó, entonces mandar al home
-        this.router.navigate(["home"]);
-      }, (error) => {
-        alert("No se pudo editar el alumno");
+    const dialogRef = this.dialog.open(EditarUserModalComponent, {
+      data: { rol: 'alumno' }, //Se pasan valores a través del componente
+      height: '288px',
+      width: '328px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.isEdit) {
+        this.alumnosService.editarAlumno(this.alumno).subscribe(
+          (response) => {
+            alert("Alumno editado correctamente");
+            console.log("Alumno editado: ", response);
+            //Si se editó, entonces mandar al home
+            this.router.navigate(["home"]);
+          }, (error) => {
+            alert("No se pudo editar al alumno");
+            console.log("Error: ", error);
+          }
+        );
+      } else {
+        console.log("No se editó la materia");
       }
-    );
+    });
   }
 
   // Funciones para password

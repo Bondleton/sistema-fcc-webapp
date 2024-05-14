@@ -62,6 +62,7 @@ export class NavbarComponent implements OnInit {
       this.activarLink(link);
     }, 100);
   }
+
   public activarLink(link: string) {
     if (link == "alumnos") {
       $("#principal").removeClass("active");
@@ -85,19 +86,8 @@ export class NavbarComponent implements OnInit {
       $("#maestro").removeClass("active");
       $("#principal").removeClass("active");
       $("#graficas").removeClass("active");
-      $("#materias").addClass("active");
+      $("#materia").addClass("active");
     }
-    else if (link == "registrar") {
-      $("#alumno").removeClass("active");
-      $("#maestro").removeClass("active");
-      $("#principal").removeClass("active");
-      $("#graficas").removeClass("active");
-      $("#materias").removeClass("active");
-      $("#registrar").addClass("active");
-    }
-
-
   }
-
 
 }
